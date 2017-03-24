@@ -13,6 +13,9 @@
 			</a>
 		</h2>
 
+		<?php the_terms( $post->ID, 'brand', '<h3>', ', ', '</h3>' ); ?>
+		<?php the_terms( $post->ID, 'feature', '<p>', ', ', '</p>' ); ?>
+
 		<?php the_post_thumbnail( 'large' ); ?>
 
 		<div class="entry-content">
@@ -41,5 +44,5 @@
 <!-- end #content -->
 
 
-<?php get_sidebar(); //include sidebar.php ?>
+<?php get_sidebar( 'shop' ); //include sidebar-shop.php ?>
 <?php get_footer(); //include footer.php ?>

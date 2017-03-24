@@ -3,6 +3,9 @@
 <main id="content" class="product-grid">
 	<?php
 	if( have_posts() ){
+	?>
+	<h1>Products by <?php single_cat_title(); ?></h1>
+	<?php
 		while( have_posts() ){
 			the_post();
 	 ?>
@@ -39,5 +42,5 @@
 <!-- end #content -->
 
 
-<?php get_sidebar(); //include sidebar.php ?>
+<?php get_sidebar( 'shop' ); //include sidebar-shop.php ?>
 <?php get_footer(); //include footer.php ?>
