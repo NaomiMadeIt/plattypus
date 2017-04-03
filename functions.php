@@ -1,8 +1,14 @@
 <?php
 //turn on sleeping features
 
+//auto embed max width
+if ( ! isset( $content_width ) ) $content_width = 710;
+// ▲ Sets the width of embeded content (like a youtube video or a tweet) ▲
+
 //featured image support:
 add_theme_support('post-thumbnails');
+
+add_editor_style(); //make the file editor-style.css
 
 add_theme_support( 'post-formats', array( 'quote', 'link', 'audio', 'video', 'image',
 		'gallery', 'aside', 'status' ) );
