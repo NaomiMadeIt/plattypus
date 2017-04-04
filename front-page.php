@@ -2,6 +2,13 @@
 
 <main id="content">
 	<?php
+		//check to see if the slider plugin exists before running its function
+		if( function_exists( 'nkr_slider' ) ){
+			nkr_slider();
+		}
+	?>
+
+	<?php
 	if ( have_posts() ) {
 		while ( have_posts() ) {
 			the_post();
