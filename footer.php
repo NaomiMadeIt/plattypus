@@ -2,6 +2,7 @@
 <!-- end .wrapper -->
 
 <footer id="footer" role="contentinfo">
+	<?php platty_secondary_logo(); ?>
 	<?php dynamic_sidebar('Footer Area'); //registered in functions.php ?>
 </footer>
 

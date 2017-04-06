@@ -17,8 +17,10 @@ add_theme_support( 'custom-background' );
 
 //don't forget to show the header image in the header.php file
 add_theme_support( 'custom-header', array(
-	'width' 		=> 960,
-	'height' 		=> 700,
+	'width' 				=> 960,
+	'height' 				=> 700,
+	'flex-width'    => true,
+	'flex-height'   => true,
 ) );
 
 //don't forget the_custom_logo() to display it in your theme
@@ -123,6 +125,15 @@ function platty_widget_areas(){
 		'before_title'	=> '<h3 class="widget-title">',
 		'after_title' 	=> '</h3>',
 	) );
+	register_sidebar( array(
+		'name'  => 'Page Area',
+		'id'  => 'page-area',
+		'description' => 'Appears in the static pages',
+		'before_widget' => '<section id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</section>',
+		'before_title'  => '<h3 class="widget-title">',
+		'after_title' => '</h3>',
+	) );
 }
 add_action( 'widgets_init', 'platty_widget_areas' );
 
@@ -133,6 +144,23 @@ function platty_comments_reply(){
 	wp_enqueue_script( 'comment-reply' );
 }
 add_action( 'wp_enqueue_scripts', 'platty_comments_reply' );
+
+	//REQUIRED: Could not find the comment-reply script enqueued. See: Migrating Plugins and Themes to 2.7/Enhanced Comment Display
+	if ( is_singular() ) wp_enqueue_script( "comment-reply" );
+
+/**
+* Fix the comments number issue (remove ctrackbacks and pingbacks from comment count)
+*/
+add_filter('get_comments_number', 'comment_count', 0);
+function comment_count( $count ) {
+	if ( ! is_admin() ) {
+		global $id;
+		$comments_by_type = &separate_comments(get_comments('status=approve&post_id=' . $id));
+		return count($comments_by_type['comment']);
+	} else {
+		return $count;
+	}
+}
 
 /**
  * Helper function for showing prices of products.
@@ -170,8 +198,106 @@ function platty_size(){
 	<?php } //end of size
 }
 
+/**
+ * Customization API additions - custom colors, fonts, layouts, etc...
+ */
+ add_action( 'customize_register', 'platty_customizer' );
+ function platty_customizer( $wp_customize ){
+   //register all sections, settings, and controls here:
 
+   //"accent color"
+   $wp_customize->add_setting( 'accent_color', array(
+     'default'  => 'rosybrown',
+   ) );
 
+   //user interface for accent color
+   $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'acccent_color_control', array(
+     'label'  => 'Accent Color',
+     'section'  => 'colors', //this one is built in
+     'settings'  => 'accent_color', //added above
+   ) ) );
+
+	 // Layout options
+	 $wp_customize->add_section( 'platty_layout', array(
+		 'title'					=> 'Layout',
+		 'capability'			=> 'edit_theme_options',
+		 'priority'				=> 100,
+	 ) );
+
+	 $wp_customize->add_setting( 'header_size', array(
+		 'default'				=> 'large',
+	 ) );
+
+	 $wp_customize->add_control( new WP_Customize_Control( $wp_customize, 'header_size_control', array(
+		 'label'					=> 'Header Height',
+		 'section' 				=> 'platty_layout',
+		 'settings'				=> 'header_size',
+		 'type'						=> 'radio',
+		 'choices'				=> array(
+			 		'small'					=> 'Small',
+					'medium'				=> 'Medium',
+					'large'					=> 'Large',
+		 ),
+	 ) ) );
+
+	 // Second Cusstom Logo
+	 $wp_customize->add_setting( 'secondary_logo' );
+
+	 $wp_customize->add_control( new WP_Customize_Cropped_Image_Control( $wp_customize, 'secondary_logo_control', array(
+		 'label'					=> 'Secondary Logo',
+		 'section'				=> 'title_tagline', //built in "site idenity" section
+		 'settings'				=> 'secondary_logo',
+	 ) ) );
+
+ } //end platty_customizer
+
+ /**
+  * Customized CSS - This displays the customizer changes
+  */
+  add_action( 'wp_head', 'platty_custom_css' );
+  function platty_custom_css(){
+		switch( get_theme_mod('header_size') ){
+			case 'small':
+				$size = '20vh';
+			break;
+			case 'medium':
+				$size = '30vh';
+			break;
+			default:
+				$size = '40vh';
+		} //end switch
+		?>
+
+    <style type='text/css'>
+    #header .custom-logo-link{
+      background-color: <?php echo get_theme_mod( 'accent_color' ); ?>;
+    }
+		#header{
+			border-color: <?php echo get_theme_mod( 'accent_color' ); ?>;
+		}
+
+		@media screen and (min-width: 700px){
+			#header{
+				min-height: <?php echo $size; ?>;
+			}
+		}
+    </style>
+
+    <?php
+  }
+
+/**
+ * Helper function to show custom secondary logo
+ */
+function platty_secondary_logo(){
+	$logo = get_theme_mod( 'secondary_logo' );
+	if($logo){
+		echo wp_get_attachment_image( $logo, 'thumbnail', false, array(
+			'class'	=> 'secondary_logo',
+		) );
+
+	}
+}
 
 
 
